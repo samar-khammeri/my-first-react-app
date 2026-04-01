@@ -1,40 +1,76 @@
-const courseTitle = "Frontend Development with React";
-
+// Step 1: Understanding the data structure
+// Each news story needs:
+// - title: the article headline
+// - url: link to read the full story
+// - author: who wrote it
+// - objectID: unique ID (this will be our React key)
+// - points: how many upvotes
+// - num_comments: how many people commented
+//
+// Which property should be the React key?
+// objectID is the best choice because it's guaranteed unique.
+//
+// Why is this realistic for an API?
+// APIs return data in this structured format with consistent properties.
+const stories = [
+  {
+    objectID: 1,
+    title: "React 19 Released with New Features",
+    url: "https://react.dev/blog/2024/12/05/react-19",
+    author: "react-team",
+    points: 500,
+    num_comments: 89
+  },
+  {
+    objectID: 2,
+    title: "GitHub Copilot Gets Better at Understanding Context",
+    url: "https://github.blog/news/copilot-update",
+    author: "github-engineering",
+    points: 278,
+    num_comments: 45
+  },
+   { 
+    objectID: 3,
+    title: "VS Code Update: Better Git Integration",
+    url: "https://code.visualstudio.com/updates",
+    author: "vscode-team",
+    points: 156,
+    num_comments: 34
+  }
+];
 function App() {
-  const studentName = "Samar Khammeri";
-  const student = {
-    name: "Samar Khammeri",
-    age: 22,
-    track: "Web Development"
-  };
-  function sayHello() {
-  return `Hello, I'm ${studentName} and I'm learning React!`;
-}
-  
-return (
-  <div>
-    <h1>Welcome to My React Journey</h1>
-    <p>My name is {studentName}</p>
-    <p>Course: {courseTitle}</p>
-    <p>Welcome to {courseTitle}, {studentName}!</p>
-    
-    <label htmlFor="studentEmail">Your Email:</label>
-    <input type="text" id="studentEmail" placeholder="Enter your email" />
-    <h2>Student Details:</h2>
-<p>Name: {student.name}</p>
-<p>Age: {student.age}</p>
-<p>Track: {student.track}</p>
-<p>{sayHello()}</p>
-  </div>
-);
+  return (
+    <div>
+      <h1>Hacker News Style News Feed</h1>
+      
+      {stories.map(function(story) {
+        return (
+          <div>
+            <h3>
+              <a href={story.url} target="_blank" rel="noopener noreferrer">
+                {story.title}
+              </a>
+            </h3>
+            <p>
+              By: {story.author} | Points: {story.points} | Comments: {story.num_comments}
+            </p>
+            key={story.objectID}
+          </div>
+        );
+      })}
+    </div>
+  );
 }
 
 export default App;
-// 1. One thing I understand well in this lab:
-// I understand how to use curly braces {} to show variables inside JSX.
-
-// 2. One thing that is still confusing:
-// I still get confused about when to use parentheses after a function name.
-
-// 3. One mistake I made and fixed:
-// I accidentally named my CSS file wrong earlier (index.html.css) and had to rename it.
+// Why is map() essential for rendering lists in React?
+// map() goes through each item in the array and returns JSX. 
+// I tried using forEach() first but nothing showed up on the page.
+//
+// Why is objectID the correct key?
+// objectID is unique for each story. If I used the index, 
+// things might break if I add or delete stories later.
+//
+// What will change when we replace fake data with the Hacker News API?
+// Instead of having the data hardcoded, we'll fetch it from a URL.
+// I'll need to use useState and useEffect to load it when the page loads.
