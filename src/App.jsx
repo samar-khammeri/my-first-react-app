@@ -29,7 +29,7 @@ const stories = [
     points: 278,
     num_comments: 45
   },
-   { 
+  { 
     objectID: 3,
     title: "VS Code Update: Better Git Integration",
     url: "https://code.visualstudio.com/updates",
@@ -38,14 +38,13 @@ const stories = [
     num_comments: 34
   }
 ];
-function App() {
+
+function List() {
   return (
     <div>
-      <h1>Hacker News Style News Feed</h1>
-      
       {stories.map(function(story) {
         return (
-          <div>
+          <div key={story.objectID}>
             <h3>
               <a href={story.url} target="_blank" rel="noopener noreferrer">
                 {story.title}
@@ -54,15 +53,39 @@ function App() {
             <p>
               By: {story.author} | Points: {story.points} | Comments: {story.num_comments}
             </p>
-            key={story.objectID}
           </div>
         );
       })}
     </div>
   );
 }
+function Search() {
+  return (
+    <>
+      <label htmlFor="search">Search:</label>
+      <input type="text" id="search" placeholder="Search stories..." />
+    </>
+  );
+} 
+  function Header() {
+  return (
+    <header>
+      <h1>Hacker News Style News Feed</h1>
+    </header>
+  );
+}
+function App() {
+  return (
+    <div>
+      <Header />
+      <Search />
+      <List />
+    </div>
+  );
+}
 
 export default App;
+// lab 3 //
 // Why is map() essential for rendering lists in React?
 // map() goes through each item in the array and returns JSX. 
 // I tried using forEach() first but nothing showed up on the page.
@@ -74,3 +97,18 @@ export default App;
 // What will change when we replace fake data with the Hacker News API?
 // Instead of having the data hardcoded, we'll fetch it from a URL.
 // I'll need to use useState and useEffect to load it when the page loads.
+
+// lab 4 //
+// What does App do now?
+// App is like the main layout. It puts the Header, Search, and List components together.
+//
+// What does List do?
+// List handles only the stories. It loops through them and displays each one.
+//
+// What does Search do?
+// Search only shows the search bar. It doesn't do any filtering yet.
+//
+// Why is this structure cleaner than before?
+// Before, everything was inside App and it was getting long. Now each component
+// has one job. If something breaks with the stories, I know to look in List.
+// If something breaks with the search, I know to look in Search.
