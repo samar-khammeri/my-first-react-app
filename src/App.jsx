@@ -39,42 +39,51 @@ const stories = [
   }
 ];
 
-function List() {
+const List = () => {
   return (
     <div>
-      {stories.map(function(story) {
-        return (
-          <div key={story.objectID}>
-            <h3>
-              <a href={story.url} target="_blank" rel="noopener noreferrer">
-                {story.title}
-              </a>
-            </h3>
-            <p>
-              By: {story.author} | Points: {story.points} | Comments: {story.num_comments}
-            </p>
-          </div>
-        );
-      })}
+      {stories.map((story) => (
+        <div key={story.objectID}>
+          <h3>
+            <a href={story.url} target="_blank" rel="noopener noreferrer">
+              {story.title}
+            </a>
+          </h3>
+          <p>
+            By: {story.author} | Points: {story.points} | Comments: {story.num_comments}
+          </p>
+        </div>
+      ))}
     </div>
   );
-}
-function Search() {
+};
+const Search = () => {
+  const handleInput = (event) => {
+    console.log("User is typing:", event.target.value);
+      console.log("Input value:", event.target.value);
+  console.log("Event type:", event.type);
+  };
+
   return (
     <>
       <label htmlFor="search">Search:</label>
-      <input type="text" id="search" placeholder="Search stories..." />
+      <input 
+        type="text" 
+        id="search" 
+        placeholder="Search stories..." 
+        onChange={handleInput}
+      />
     </>
   );
-} 
-  function Header() {
+};
+  const Header = () => {
   return (
     <header>
       <h1>Hacker News Style News Feed</h1>
     </header>
   );
-}
-function App() {
+};
+const App = () => {
   return (
     <div>
       <Header />
@@ -82,7 +91,7 @@ function App() {
       <List />
     </div>
   );
-}
+};
 
 export default App;
 // lab 3 //
@@ -112,3 +121,13 @@ export default App;
 // Before, everything was inside App and it was getting long. Now each component
 // has one job. If something breaks with the stories, I know to look in List.
 // If something breaks with the search, I know to look in Search.
+
+// lab 5 //
+// When do we use concise body arrow functions?
+// When the function only returns something with no extra logic.
+//
+// When do we use block body arrow functions?
+// When we need to add logic, variables, or multiple lines.
+//
+// What does an event object contain?
+// It has information about what happened, like target (the input), value, type, etc.
