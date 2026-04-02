@@ -12,7 +12,69 @@
 //
 // Why is this realistic for an API?
 // APIs return data in this structured format with consistent properties.
-const stories = [
+
+import { useState } from 'react';
+const Item = ({ story }) => {
+  console.log("Item rendered for:", story.title);
+  return (
+    <div key={story.objectID}>
+      <h3>
+        <a href={story.url} target="_blank" rel="noopener noreferrer">
+          {story.title}
+        </a>
+      </h3>
+      <p>
+        By: {story.author} | Points: {story.points} | Comments: {story.num_comments}
+      </p>
+    </div>
+  );
+};
+const List = ({ stories }) => {
+  console.log("List rendered");
+  return (
+    <div>
+      {stories.map((story) => (
+        <Item key={story.objectID} story={story} />
+      ))}
+    </div>
+  );
+};
+const Search = ({ onSearch }) => {
+  console.log("Search rendered");
+  const handleInput = (event) => {
+    console.log("User is typing:", event.target.value);
+    console.log("Input value:", event.target.value);
+    console.log("Event type:", event.type);
+    onSearch(event);
+  };
+
+  return (
+    <>
+      <label htmlFor="search">Search:</label>
+      <input 
+        type="text" 
+        id="search" 
+        placeholder="Search stories..." 
+        onChange={handleInput}
+      />
+    </>
+  );
+};
+  const Header = () => {
+ console.log("Header rendered");
+    return (
+    <header>
+      <h1>Hacker News Style News Feed</h1>
+    </header>
+  );
+};
+const App = () => {
+   console.log("App rendered");
+  const [searchTerm, setSearchTerm] = useState('');
+   const handleSearch = (event) => {
+    setSearchTerm(event.target.value);
+  };
+   const stories = [
   {
     objectID: 1,
     title: "React 19 Released with New Features",
@@ -38,57 +100,15 @@ const stories = [
     num_comments: 34
   }
 ];
-
-const List = () => {
-  return (
-    <div>
-      {stories.map((story) => (
-        <div key={story.objectID}>
-          <h3>
-            <a href={story.url} target="_blank" rel="noopener noreferrer">
-              {story.title}
-            </a>
-          </h3>
-          <p>
-            By: {story.author} | Points: {story.points} | Comments: {story.num_comments}
-          </p>
-        </div>
-      ))}
-    </div>
+   const filteredStories = stories.filter((story) =>
+    story.title.toLowerCase().includes(searchTerm.toLowerCase())
   );
-};
-const Search = () => {
-  const handleInput = (event) => {
-    console.log("User is typing:", event.target.value);
-      console.log("Input value:", event.target.value);
-  console.log("Event type:", event.type);
-  };
-
-  return (
-    <>
-      <label htmlFor="search">Search:</label>
-      <input 
-        type="text" 
-        id="search" 
-        placeholder="Search stories..." 
-        onChange={handleInput}
-      />
-    </>
-  );
-};
-  const Header = () => {
-  return (
-    <header>
-      <h1>Hacker News Style News Feed</h1>
-    </header>
-  );
-};
-const App = () => {
-  return (
+return (
     <div>
       <Header />
-      <Search />
-      <List />
+    <Search onSearch={handleSearch} />
+    <p>You are searching for: <strong>{searchTerm}</strong></p>
+    <List stories={filteredStories} />
     </div>
   );
 };
@@ -131,3 +151,16 @@ export default App;
 //
 // What does an event object contain?
 // It has information about what happened, like target (the input), value, type, etc.
+
+// lab 6 //
+// What is the difference between props and state?
+// Props are data passed from a parent component to a child. The child cannot change props.
+// State is data that belongs to a component. The component can change its own state using setState.
+//
+// Why do we lift state up?
+// When two or more components need access to the same data, we move that data to their closest common parent.
+// Then we pass it down as props. This keeps everything in sync.
+//
+// Where should filtering logic live?
+// Filtering should live where the data and the search term both exist. In my app, that's App.
+// App owns the stories array and the searchTerm state, so it filters before passing to List.
