@@ -1,19 +1,5 @@
-// Step 1: Understanding the data structure
-// Each news story needs:
-// - title: the article headline
-// - url: link to read the full story
-// - author: who wrote it
-// - objectID: unique ID (this will be our React key)
-// - points: how many upvotes
-// - num_comments: how many people commented
-//
-// Which property should be the React key?
-// objectID is the best choice because it's guaranteed unique.
-//
-// Why is this realistic for an API?
-// APIs return data in this structured format with consistent properties.
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 const Item = ({ story }) => {
   console.log("Item rendered for:", story.title);
   return (
@@ -39,7 +25,7 @@ const List = ({ stories }) => {
     </div>
   );
 };
-const Search = ({ onSearch }) => {
+const Search = ({ onSearch, searchTerm }) => {
   console.log("Search rendered");
   const handleInput = (event) => {
     console.log("User is typing:", event.target.value);
@@ -51,12 +37,13 @@ const Search = ({ onSearch }) => {
   return (
     <>
       <label htmlFor="search">Search:</label>
-      <input 
-        type="text" 
-        id="search" 
-        placeholder="Search stories..." 
-        onChange={handleInput}
-      />
+    <input 
+  type="text" 
+  id="search" 
+  placeholder="Search stories..." 
+  onChange={handleInput}
+  value={searchTerm}
+/>
     </>
   );
 };
@@ -70,10 +57,19 @@ const Search = ({ onSearch }) => {
 };
 const App = () => {
    console.log("App rendered");
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState(() => {
+  const savedSearch = localStorage.getItem("search");
+  return savedSearch || '';
+});
+useEffect(() => {
+  console.log("useEffect ran - saving to localStorage:", searchTerm);
+  localStorage.setItem("search", searchTerm);
+}, [searchTerm]);
    const handleSearch = (event) => {
-    setSearchTerm(event.target.value);
-  };
+  const newSearchTerm = event.target.value;
+  console.log("handleSearch - about to set state:", newSearchTerm);
+  setSearchTerm(newSearchTerm);
+};
    const stories = [
   {
     objectID: 1,
@@ -114,53 +110,18 @@ return (
 };
 
 export default App;
-// lab 3 //
-// Why is map() essential for rendering lists in React?
-// map() goes through each item in the array and returns JSX. 
-// I tried using forEach() first but nothing showed up on the page.
+// What is a controlled component?
+// A controlled component is when React controls the input's value through state.
+// The value comes from props/state, not from the DOM. In my app, the search input
+// gets its value from searchTerm state and updates when setSearchTerm is called.
 //
-// Why is objectID the correct key?
-// objectID is unique for each story. If I used the index, 
-// things might break if I add or delete stories later.
+// What is a side effect in React?
+// A side effect is anything that affects something outside the React component.
+// Examples from my app: saving to localStorage, console.log statements.
+// Side effects should not happen during rendering, which is why we use useEffect.
 //
-// What will change when we replace fake data with the Hacker News API?
-// Instead of having the data hardcoded, we'll fetch it from a URL.
-// I'll need to use useState and useEffect to load it when the page loads.
-
-// lab 4 //
-// What does App do now?
-// App is like the main layout. It puts the Header, Search, and List components together.
-//
-// What does List do?
-// List handles only the stories. It loops through them and displays each one.
-//
-// What does Search do?
-// Search only shows the search bar. It doesn't do any filtering yet.
-//
-// Why is this structure cleaner than before?
-// Before, everything was inside App and it was getting long. Now each component
-// has one job. If something breaks with the stories, I know to look in List.
-// If something breaks with the search, I know to look in Search.
-
-// lab 5 //
-// When do we use concise body arrow functions?
-// When the function only returns something with no extra logic.
-//
-// When do we use block body arrow functions?
-// When we need to add logic, variables, or multiple lines.
-//
-// What does an event object contain?
-// It has information about what happened, like target (the input), value, type, etc.
-
-// lab 6 //
-// What is the difference between props and state?
-// Props are data passed from a parent component to a child. The child cannot change props.
-// State is data that belongs to a component. The component can change its own state using setState.
-//
-// Why do we lift state up?
-// When two or more components need access to the same data, we move that data to their closest common parent.
-// Then we pass it down as props. This keeps everything in sync.
-//
-// Where should filtering logic live?
-// Filtering should live where the data and the search term both exist. In my app, that's App.
-// App owns the stories array and the searchTerm state, so it filters before passing to List.
+// Why do we use useEffect instead of calling code directly?
+// If I called localStorage.setItem directly inside the component body, it would run
+// on every render, even when searchTerm hasn't changed. useEffect lets me control
+// when it runs by using a dependency array. It also runs after the browser paints,
+// so it doesn't slow down the UI.
