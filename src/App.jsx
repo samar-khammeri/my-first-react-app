@@ -25,28 +25,20 @@ const List = ({ stories }) => {
     </div>
   );
 };
-const Search = ({ onSearch, searchTerm }) => {
-  console.log("Search rendered");
-  const handleInput = (event) => {
-    console.log("User is typing:", event.target.value);
-    console.log("Input value:", event.target.value);
-    console.log("Event type:", event.type);
-    onSearch(event);
-  };
-
+const InputWithLabel = ({ id, children, value, onInputChange, type = "text" }) => {
   return (
     <>
-      <label htmlFor="search">Search:</label>
-    <input 
-  type="text" 
-  id="search" 
-  placeholder="Search stories..." 
-  onChange={handleInput}
-  value={searchTerm}
-/>
+      <label htmlFor={id}>{children}</label>
+      <input
+        id={id}
+        type={type}
+        value={value}
+        onChange={onInputChange}
+      />
     </>
   );
 };
+
   const Header = () => {
  console.log("Header rendered");
     return (
@@ -102,7 +94,13 @@ useEffect(() => {
 return (
     <div>
       <Header />
-    <Search onSearch={handleSearch} />
+    <InputWithLabel
+  id="search"
+  value={searchTerm}
+  onInputChange={handleSearch}
+>
+  <strong>Search:</strong>
+</InputWithLabel>
     <p>You are searching for: <strong>{searchTerm}</strong></p>
     <List stories={filteredStories} />
     </div>
@@ -110,18 +108,3 @@ return (
 };
 
 export default App;
-// What is a controlled component?
-// A controlled component is when React controls the input's value through state.
-// The value comes from props/state, not from the DOM. In my app, the search input
-// gets its value from searchTerm state and updates when setSearchTerm is called.
-//
-// What is a side effect in React?
-// A side effect is anything that affects something outside the React component.
-// Examples from my app: saving to localStorage, console.log statements.
-// Side effects should not happen during rendering, which is why we use useEffect.
-//
-// Why do we use useEffect instead of calling code directly?
-// If I called localStorage.setItem directly inside the component body, it would run
-// on every render, even when searchTerm hasn't changed. useEffect lets me control
-// when it runs by using a dependency array. It also runs after the browser paints,
-// so it doesn't slow down the UI.
