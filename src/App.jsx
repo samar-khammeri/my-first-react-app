@@ -1,5 +1,8 @@
 
 import { useState, useEffect } from 'react';
+
+const API_BASE_URL = 'https://hn.algolia.com/api/v1/search?query=';
+
 const Item = ({ story, onRemoveItem }) => {
   console.log("Item rendered for:", story.title);
   return (
@@ -18,6 +21,7 @@ const Item = ({ story, onRemoveItem }) => {
     </div>
   );
 };
+
 const List = ({ stories, onRemoveItem }) => {
   console.log("List rendered");
   return (
@@ -32,6 +36,7 @@ const List = ({ stories, onRemoveItem }) => {
     </div>
   );
 };
+
 const InputWithLabel = ({ id, children, value, onInputChange, type = "text" }) => {
   return (
     <>
@@ -46,14 +51,15 @@ const InputWithLabel = ({ id, children, value, onInputChange, type = "text" }) =
   );
 };
 
-  const Header = () => {
- console.log("Header rendered");
-    return (
+const Header = () => {
+  console.log("Header rendered");
+  return (
     <header>
       <h1>Hacker News Style News Feed</h1>
     </header>
   );
 };
+
 const App = () => {
   console.log("App rendered");
   
@@ -62,54 +68,52 @@ const App = () => {
     return savedSearch || '';
   });
   
-  useEffect(() => {
-    console.log("useEffect ran - saving to localStorage:", searchTerm);
-    localStorage.setItem("search", searchTerm);
-  }, [searchTerm]);
+  const [fetchedStories, setFetchedStories] = useState([]);
+const [isLoading, setIsLoading] = useState(false);
+const [isError, setIsError] = useState(false);
+const [url, setUrl] = useState('');
+useEffect(() => {
+  if (url === '') {
+    setFetchedStories([]);
+    setIsError(false);
+    return;
+  }
   
+  setIsLoading(true);
+  setIsError(false);
+  
+  console.log("Fetching:", url);
+  
+  fetch(url)
+    .then((response) => response.json())
+    .then((data) => {
+      console.log("Data received:", data);
+      setFetchedStories(data.hits || []);
+      setIsLoading(false);
+    })
+    .catch((error) => {
+      console.error("Fetch error:", error);
+      setIsError(true);
+      setIsLoading(false);
+    });
+}, [url]); 
+ 
   const handleSearch = (event) => {
     const newSearchTerm = event.target.value;
     console.log("handleSearch - about to set state:", newSearchTerm);
     setSearchTerm(newSearchTerm);
   };
-  
-  const initialStories = [
-    {
-      objectID: 1,
-      title: "React 19 Released with New Features",
-      url: "https://react.dev/blog/2024/12/05/react-19",
-      author: "react-team",
-      points: 500,
-      num_comments: 89
-    },
-    {
-      objectID: 2,
-      title: "GitHub Copilot Gets Better at Understanding Context",
-      url: "https://github.blog/news/copilot-update",
-      author: "github-engineering",
-      points: 278,
-      num_comments: 45
-    },
-    { 
-      objectID: 3,
-      title: "VS Code Update: Better Git Integration",
-      url: "https://code.visualstudio.com/updates",
-      author: "vscode-team",
-      points: 156,
-      num_comments: 34
-    }
-  ];
-  
-  const [stories, setStories] = useState(initialStories);
+  const handleSubmit = () => {
+  if (searchTerm.trim() !== '') {
+    setUrl(`${API_BASE_URL}${searchTerm}`);
+  }
+};
+
   
   const handleRemoveStory = (objectID) => {
-    const newStories = stories.filter((story) => story.objectID !== objectID);
-    setStories(newStories);
+    const newStories = fetchedStories.filter((story) => story.objectID !== objectID);
+    setFetchedStories(newStories);
   };
-  
-  const filteredStories = stories.filter((story) =>
-    story.title.toLowerCase().includes(searchTerm.toLowerCase())
-  );
   
   return (
     <div>
@@ -121,21 +125,28 @@ const App = () => {
       >
         <strong>Search:</strong>
       </InputWithLabel>
+      <button disabled={searchTerm.trim() === ''} onClick={handleSubmit}>Submit</button>
       <p>You are searching for: <strong>{searchTerm}</strong></p>
-      <List stories={filteredStories} onRemoveItem={handleRemoveStory} />
+      {isError && <p style={{ color: 'red' }}>Something went wrong. Please try again.</p>}
+
+ {isLoading ? (
+  <p>Loading stories...</p>
+) : (
+  <List stories={fetchedStories} onRemoveItem={handleRemoveStory} />
+)}
     </div>
   );
 };
 
 export default App;
-// What makes a component reusable?
-// A component is reusable when it uses generic props instead of domain-specific names.
-// For example, InputWithLabel uses "value" and "onInputChange" instead of "searchTerm" and "onSearch".
+// Why use useEffect for fetching?
+// Because fetching data is a side effect. It doesn't happen during rendering.
+// useEffect runs after the component renders and can sync with external APIs.
 //
-// What is component composition?
-// Composition is when you pass content inside a component's tags using the children prop.
-// Example: <InputWithLabel><strong>Search:</strong></InputWithLabel>
+// What is the difference between loading and error state?
+// Loading state shows that something is in progress. Error state shows that something went wrong.
+// They are different UI states that tell the user what's happening.
 //
-// Why do we pass handlers down the component tree?
-// Because state lives in the parent component (App), but the action (clicking Delete)
-// happens in a child component (Item). The child needs a way to tell the parent to update state.
+// Why control when fetching happens?
+// Fetching on every keystroke wastes API calls and can be slow.
+// Letting the user click Submit gives them control and reduces unnecessary requests.
